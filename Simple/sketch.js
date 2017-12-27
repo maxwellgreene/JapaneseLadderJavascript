@@ -18,30 +18,36 @@ functions:
 addrungs(), etc
 */
 
-
+//BEGIN VARIABLES
 var numRails = 5;
-var Entire = [];
+var Ladders = [];
 //var rungs = [];
 var offset = 6000;
 var solverSet = [];
-var tempSolverSet = [];
 var goalSet = [];
-var temp;
+var tempValue;
+//END VARIABLES
 
+//BEGIN SETUP
 function setup() {
 	createCanvas(600, 600);
+	frameRate(30);
 	for (var i = 0; i < numRails - 1; i++) {
 		let rungs = [];
-		Entire[i] = new Ladder(rungs, i);
+		Ladders[i] = new Ladder(rungs, i);
 	}
 	for (var j = 0; j < numRails; j++) {
 		goalSet[j] = Math.floor(random(0, numRails));
 	}
-	print(goalSet);
-}
 
+
+
+}
+//END SETUP
+
+//BEGIN DRAW
 function draw() {
-	background(100);
+	background(205,100,156);
 
 	drawGUI();
 	drawRails();
@@ -49,24 +55,23 @@ function draw() {
 	Solver();
 	drawSolver();
 
-
-	for (var i = 0; i < Entire.length; i++) {
-		Entire[i].display(Entire[i].rungs.length);
+	for (var i = 0; i < Ladders.length; i++) {
+		Ladders[i].display(Ladders[i].rungs.length);
 	}
-
 	if (keyIsPressed) {
 		keyPressed();
 	}
-
 }
+//END DRAW
 
+//BEGIN GUI
 function mousePressed() {
-	print(mouseX + "  " + mouseY);
+	//print(mouseX + "  " + mouseY);
 	if (mouseY > ((1 / 5) * height) & mouseY < ((4 / 5) * height)) {
 		interact(mouseX, mouseY);
 	}
-	for (var i = 0; i < Entire.length; i++) {
-		Entire[i].printit();
+	for (var i = 0; i < Ladders.length; i++) {
+		Ladders[i].printit();
 	}
 }
 
@@ -74,7 +79,7 @@ function keyPressed() {
 
 	if (keyCode == LEFT_ARROW) {
 		offset -= 3;
-		print(offset);
+		//print(offset);
 	}
 	if (keyCode == RIGHT_ARROW) {
 		offset += 3;
@@ -83,13 +88,21 @@ function keyPressed() {
 }
 
 function interact(X, Y) {
+	addRung(X,Y);
+
+}
+//END GUI
+
+function addRung(X,Y)
+{
 	for (var i = 0; i < numRails; i++) {
 		if (X > getLeft(i) & X < getRight(i)) {
-			append(Entire[i].rungs, Y);
+			append(Ladders[i].rungs, Y);
 		}
 	}
 }
 
+//BEGIN LADDER
 function Ladder(_rungs, _ladderNum) {
 	this.rungs = _rungs;
 	this.ladderNum = _ladderNum;
@@ -104,10 +117,11 @@ Ladder.prototype.display = function(_length) {
 }
 
 Ladder.prototype.printit = function() {
-	print(this.rungs);
+	//print(this.rungs);
 }
+//END LADDER
 
-
+//BEGIN DRAWING FUNCTIONS
 function drawRails() {
 	for (var i = 0; i < numRails; i++) {
 		stroke(255);
@@ -137,8 +151,8 @@ function drawGUI() {
 
 function drawRungs() {
 	stroke(255);
-	for (var i = 0; i < Entire.length; i++) {
-		Entire[i].display(Entire[i].rungs.length);
+	for (var i = 0; i < Ladders.length; i++) {
+		Ladders[i].display(Ladders[i].rungs.length);
 	}
 }
 
@@ -150,38 +164,42 @@ function drawSolver() {
 	for (var i = 0; i < numRails; i++) {
 		text(solverSet[i], getLeft(i) - 5, (4 / 5) * height + 25);
 	}
-
 	//goal
 	for (var j = 0; j < numRails; j++) {
 		text(goalSet[j], getLeft(j) - 5, (4 / 5) * height + 50);
 	}
 }
+//END DRAWING FUNCTIONS
 
+//BEGIN FUNCTIONS
 function Solver() {
-
 	for (var i = 0; i < numRails; i++) {
-		tempSolverSet[i] = i + 1;
+		solverSet[i] = i + 1;
 	}
-	solverSet = tempSolverSet;
 
-	for (var pixel = 0; pixel < ((3 / 5) * height); pixel++) {
-		for (var ladder = 0; ladder < Entire.length; ladder++) {
-		  print(Entire[ladder].length);
-			for (var element = 0; element < Entire[ladder].length; element++) {
-			if(Entire[ladder][element] == pixel)
-			{
-			  print(ladder);
-			  swapValues(ladder);
-			}
+	for (var pixel = (height/5); pixel < ((4 / 5) * height); pixel++) {
+		//print(pixel);
+		for (var ladder = 0; ladder < Ladders.length; ladder++) {
+			for (var element = 0; element < Ladders[ladder].rungs.length; element++) {
+				if(Ladders[ladder].rungs[element] == pixel)
+				{
+					//console.log("this happened at: "+ladder+",  "+Ladders[ladder].rungs[element]);
+					tempValue = solverSet[ladder];
+					solverSet[ladder] = solverSet[ladder + 1];
+					solverSet[ladder + 1] = tempValue;
+					//console.log(tempValue);
+			  	//swapValues(ladder);
+				}
 			}
 		}
 	}
+	//do an indexof search
 }
 
-function swapValues(index) {
-	temp = tempSolverSet[index];
-	tempSolverSet[index] = tempSolverSet[index + 1];
-	tempSolverSet[index + 1] = temp;
+function swapValues(ladder) {
+	tempValue = solverSet[ladder];
+	solverSet[ladder] = solverSet[ladder + 1];
+	solverSet[ladder + 1] = tempValue;
 }
 
 function generateRandom(min, max) {
@@ -205,3 +223,4 @@ function getRight(index) {
 function getCenter(index) {
 	return (offset + ((index / numRails) * width) + (width / (numRails))) % width;
 }
+//END FUNCTIONS
