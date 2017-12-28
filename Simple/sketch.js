@@ -47,7 +47,7 @@ function setup() {
 
 //BEGIN DRAW
 function draw() {
-	background(0);
+	background(100,205,145);
 
 	drawGUI();
 	drawRails();
@@ -164,10 +164,12 @@ function drawSolver() {
 	for (var i = 0; i < numRails; i++) {
 		text(solverSet[i], getLeft(i) - 5, (4 / 5) * height + 25);
 	}
+	/*
 	//goal
 	for (var j = 0; j < numRails; j++) {
 		text(goalSet[j], getLeft(j) - 5, (4 / 5) * height + 50);
 	}
+	*/
 }
 //END DRAWING FUNCTIONS
 
@@ -178,22 +180,17 @@ function Solver() {
 	}
 
 	for (var pixel = (height/5); pixel < ((4 / 5) * height); pixel++) {
-		//print(pixel);
 		for (var ladder = 0; ladder < Ladders.length; ladder++) {
 			for (var element = 0; element < Ladders[ladder].rungs.length; element++) {
 				if(Ladders[ladder].rungs[element] == pixel)
 				{
-					//console.log("this happened at: "+ladder+",  "+Ladders[ladder].rungs[element]);
 					tempValue = solverSet[ladder];
 					solverSet[ladder] = solverSet[ladder + 1];
 					solverSet[ladder + 1] = tempValue;
-					//console.log(tempValue);
-			  	//swapValues(ladder);
 				}
 			}
 		}
 	}
-	//do an indexof search
 }
 
 function swapValues(ladder) {
