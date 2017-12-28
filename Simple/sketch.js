@@ -47,7 +47,7 @@ function setup() {
 
 //BEGIN DRAW
 function draw() {
-	background(205,100,156);
+	background(0);
 
 	drawGUI();
 	drawRails();
