@@ -26,6 +26,7 @@ var offset = 6000;
 var solverSet = [];
 var goalSet = [];
 var tempValue;
+var sameCounter = 0;
 //END VARIABLES
 
 //BEGIN SETUP
@@ -37,11 +38,9 @@ function setup() {
 		Ladders[i] = new Ladder(rungs, i);
 	}
 	for (var j = 0; j < numRails; j++) {
-		goalSet[j] = Math.floor(random(0, numRails));
+		goalSet[j] = j+1;
 	}
-
-
-
+	shuffle(goalSet,true);
 }
 //END SETUP
 
@@ -160,16 +159,14 @@ function drawSolver() {
 	textSize(20);
 	fill(255);
 	//solved
-
 	for (var i = 0; i < numRails; i++) {
 		text(solverSet[i], getLeft(i) - 5, (4 / 5) * height + 25);
 	}
-	/*
+
 	//goal
 	for (var j = 0; j < numRails; j++) {
 		text(goalSet[j], getLeft(j) - 5, (4 / 5) * height + 50);
 	}
-	*/
 }
 //END DRAWING FUNCTIONS
 
@@ -190,6 +187,20 @@ function Solver() {
 				}
 			}
 		}
+	}
+	sameCounter=0;
+	for(var index = 0; index<goalSet.length;index++)
+	{
+		if(goalSet[index] == solverSet[index])
+		{
+			sameCounter++;
+		}
+	}
+	if(sameCounter == goalSet.length)
+	{
+		textSize(50);
+		stroke(0);
+		text("YOU WON!!", 200,200);
 	}
 }
 
