@@ -27,6 +27,7 @@ var solverSet = [];
 var goalSet = [];
 var tempValue;
 var sameCounter = 0;
+var minTranspositions = 0;
 //END VARIABLES
 
 //BEGIN SETUP
@@ -41,6 +42,9 @@ function setup() {
 		goalSet[j] = j+1;
 	}
 	shuffle(goalSet,true);
+	minTranspositions = getMinTranspositions();
+	console.log("doing");
+	print(minTranspositions);
 }
 //END SETUP
 
@@ -145,7 +149,6 @@ function drawGUI() {
 		stroke(255, 0, 0, 100);
 	}
 	ellipse(mouseX, mouseY, 15, 15);
-
 }
 
 function drawRungs() {
@@ -196,12 +199,16 @@ function Solver() {
 			sameCounter++;
 		}
 	}
-	if(sameCounter == goalSet.length)
+	if(sameCounter == goalSet.length && getMinTranspositions() == getNumTranspisitions())
 	{
 		textSize(50);
 		stroke(0);
 		text("YOU WON!!", 200,200);
-	}
+	}else if (sameCounter == goalSet.length && getMinTranspositions() < getNumTranspisitions()) {
+			textSize(50);
+			stroke(0);
+			text("CORRECT SOLUTION, TOO MANY TRANSPOSITIONS!!", 0,200);
+		}
 }
 
 function swapValues(ladder) {
@@ -218,6 +225,33 @@ function generateRandom(min, max) {
 		return (num === goalSet[i]) ? generateRandom(min, max) : num;
 	}
 	*/
+}
+
+function getMinTranspositions()
+{
+	sameCounter = 0;
+	for(var i=0;i<goalSet.length-1;i++)
+	{
+		for(var j=i+1;j<goalSet.length;j++)
+		{
+			if(goalSet[j]<goalSet[i])
+			{
+				sameCounter+=1;
+			}
+		}
+	}
+	return sameCounter;
+}
+
+function getNumTranspisitions()
+{
+	sameCounter = 0;
+	for(var i=0;i<goalSet.length-1;i++)
+	{
+		sameCounter += Ladders[i].rungs.length;
+	}
+	print(sameCounter);
+	return(sameCounter);
 }
 
 function getLeft(index) {
