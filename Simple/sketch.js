@@ -44,7 +44,6 @@ function setup() {
 	shuffle(goalSet,true);
 	minTranspositions = getMinTranspositions();
 	console.log("doing");
-	print(minTranspositions);
 }
 //END SETUP
 
@@ -161,12 +160,16 @@ function drawRungs() {
 function drawSolver() {
 	textSize(20);
 	fill(255);
+
+	stroke(255);
 	//solved
 	for (var i = 0; i < numRails; i++) {
 		text(solverSet[i], getLeft(i) - 5, (4 / 5) * height + 25);
 	}
 
 	//goal
+	noStroke();
+	fill(0,0,255);
 	for (var j = 0; j < numRails; j++) {
 		text(goalSet[j], getLeft(j) - 5, (4 / 5) * height + 50);
 	}
@@ -191,40 +194,28 @@ function Solver() {
 			}
 		}
 	}
-	sameCounter=0;
-	for(var index = 0; index<goalSet.length;index++)
-	{
-		if(goalSet[index] == solverSet[index])
-		{
-			sameCounter++;
-		}
-	}
-	if(sameCounter == goalSet.length && getMinTranspositions() == getNumTranspisitions())
+
+
+	if(goalVsSolver() && minTranspositions == getNumTranspositions())
 	{
 		textSize(50);
 		stroke(0);
 		text("YOU WON!!", 200,200);
-	}else if (sameCounter == goalSet.length && getMinTranspositions() < getNumTranspisitions()) {
-			textSize(50);
+	}else
+	 if(goalVsSolver() && minTranspositions < getNumTranspositions())
+	 {
+			textSize(25);
 			stroke(0);
-			text("CORRECT SOLUTION, TOO MANY TRANSPOSITIONS!!", 0,200);
+			text("CORRECT SOLUTION, TOO MANY TRANSPOSITIONS!!", 25,height-25);
 		}
+		print(minTranspositions)
+		print(getNumTranspositions());
 }
 
 function swapValues(ladder) {
 	tempValue = solverSet[ladder];
 	solverSet[ladder] = solverSet[ladder + 1];
 	solverSet[ladder + 1] = tempValue;
-}
-
-function generateRandom(min, max) {
-	return int(random(0, numRails));
-	/*
-	var num = Math.floor(Math.random() * (max - min + 1)) + min;
-  for (var i = 0; i < numRails; i++) {
-		return (num === goalSet[i]) ? generateRandom(min, max) : num;
-	}
-	*/
 }
 
 function getMinTranspositions()
@@ -243,15 +234,34 @@ function getMinTranspositions()
 	return sameCounter;
 }
 
-function getNumTranspisitions()
+function getNumTranspositions()
 {
 	sameCounter = 0;
 	for(var i=0;i<goalSet.length-1;i++)
 	{
 		sameCounter += Ladders[i].rungs.length;
 	}
-	print(sameCounter);
 	return(sameCounter);
+}
+
+function goalVsSolver()
+{
+	sameCounter =  0;
+	for(var index = 0; index<goalSet.length;index++)
+	{
+		if(goalSet[index] == solverSet[index])
+		{
+			sameCounter++;
+		}
+	}
+
+	if(sameCounter == goalSet.length)
+	{
+		return (true);
+	}else
+	{
+		return (false);
+	}
 }
 
 function getLeft(index) {
