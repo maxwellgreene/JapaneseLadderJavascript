@@ -1,17 +1,4 @@
 /*
-function setup() {
-  // put setup code here
-  createCanvas(400,400);
-  background(255,200,100);
-}
-
-function draw() {
-  ellipse(mouseX,mouseY,10,10);
-  // put drawing code here
-}
-*/
-
-/*
 To Do:
 
 functions:
@@ -28,6 +15,11 @@ var goalSet = [];
 var tempValue;
 var sameCounter = 0;
 var minTranspositions = 0;
+var tempBool = false;
+var clickRad = 10;
+var startX,startY;
+var mouseThresh = 0;
+var moveLadder,moveRung;
 //END VARIABLES
 
 //BEGIN SETUP
@@ -43,7 +35,6 @@ function setup() {
 	}
 	shuffle(goalSet,true);
 	minTranspositions = getMinTranspositions();
-	console.log("doing");
 }
 //END SETUP
 
@@ -68,30 +59,63 @@ function draw() {
 
 //BEGIN GUI
 function mousePressed() {
-	//print(mouseX + "  " + mouseY);
+	startX = mouseX;
+	startY = mouseY;
+
+	setMovingRung(startX,startY);
+}
+
+function mouseDragged()
+{
 	if (mouseY > ((1 / 5) * height) & mouseY < ((4 / 5) * height)) {
-		interact(mouseX, mouseY);
+		Ladders[moveLadder].rungs[moveRung] = mouseY;
+	}
+}
+
+function mouseReleased()
+{
+	if(abs(mouseX-startX) <= mouseThresh && abs(mouseY-startY) <= mouseThresh)
+	{
+		if (mouseY > ((1 / 5) * height) && mouseY < ((4 / 5) * height)) {
+			interact(mouseX, mouseY);
+		}
 	}
 	for (var i = 0; i < Ladders.length; i++) {
 		Ladders[i].printit();
 	}
+	moveLadder = null; moveRung = null;
 }
 
 function keyPressed() {
-
 	if (keyCode == LEFT_ARROW) {
 		offset -= 3;
-		//print(offset);
 	}
 	if (keyCode == RIGHT_ARROW) {
 		offset += 3;
 	}
-
 }
 
 function interact(X, Y) {
-	addRung(X,Y);
+	tempBool = false;
 
+	for(var i = 0;i<numRails;i++)
+	{
+		if(X<getRight(i) && X>getLeft(i))
+		{
+			for(var j=0;j<Ladders[i].rungs.length;j++)
+			{
+				if(Y<(Ladders[i].rungs[j]+clickRad) && Y>(Ladders[i].rungs[j]-clickRad))
+				{
+					Ladders[i].rungs.splice(j,1);
+					tempBool = true;
+				}
+			}
+		}
+	}
+	if(!tempBool)
+	{
+		addRung(X,Y);
+	}
 }
 //END GUI
 
@@ -113,8 +137,15 @@ function Ladder(_rungs, _ladderNum) {
 Ladder.prototype.display = function(_length) {
 	stroke(255);
 	for (var i = 0; i < _length; i++) {
+		strokeWeight(4);
 		line(getLeft(this.ladderNum), this.rungs[i], getLeft(this.ladderNum) + (width / numRails), this.rungs[i]);
 		line(getRight(this.ladderNum) - (width / numRails), this.rungs[i], getRight(this.ladderNum), this.rungs[i]);
+		strokeWeight(1);
+		fill(255,0,0,4);
+		noStroke();
+		rect(getLeft(this.ladderNum), this.rungs[i]-clickRad, getRight(this.ladderNum)-getLeft(this.ladderNum), 2*clickRad);
+		rect(getRight(this.ladderNum) - (width / numRails), this.rungs[i]-clickRad, getRight(this.ladderNum)-getLeft(this.ladderNum), 2*clickRad);
+		stroke(255);
 	}
 }
 
@@ -161,7 +192,8 @@ function drawSolver() {
 	textSize(20);
 	fill(255);
 
-	stroke(255);
+	noStroke(0);
+	fill(255,0,0);
 	//solved
 	for (var i = 0; i < numRails; i++) {
 		text(solverSet[i], getLeft(i) - 5, (4 / 5) * height + 25);
@@ -195,21 +227,21 @@ function Solver() {
 		}
 	}
 
-
 	if(goalVsSolver() && minTranspositions == getNumTranspositions())
 	{
-		textSize(50);
+		textSize(25);
 		stroke(0);
-		text("YOU WON!!", 200,200);
+		fill(255);
+		text("YOU WON!!", 25, height-25);
 	}else
 	 if(goalVsSolver() && minTranspositions < getNumTranspositions())
 	 {
-			textSize(25);
-			stroke(0);
-			text("CORRECT SOLUTION, TOO MANY TRANSPOSITIONS!!", 25,height-25);
+			textSize(12.5);
+			noStroke();
+			fill(255);
+			text("CORRECT SOLUTION, TOO MANY TRANSPOSITIONS!!", 25,height-50);
+			text("Your Solution: "+getNumTranspositions()+"   Optimal Solution: "+minTranspositions,25,height-35);
 		}
-		print(minTranspositions)
-		print(getNumTranspositions());
 }
 
 function swapValues(ladder) {
@@ -261,6 +293,23 @@ function goalVsSolver()
 	}else
 	{
 		return (false);
+	}
+}
+
+function setMovingRung(startX,startY)
+{
+	for(var i = 0;i<numRails;i++)
+	{
+		if(startX<getRight(i) && startX>getLeft(i))
+		{
+			for(var j=0;j<Ladders[i].rungs.length;j++)
+			{
+				if(startY<(Ladders[i].rungs[j]+clickRad) && startY>(Ladders[i].rungs[j]-clickRad))
+				{
+					moveLadder = i; moveRung = j;
+				}
+			}
+		}
 	}
 }
 
