@@ -1,8 +1,6 @@
 /*
 To Do:
 
-functions:
-addrungs(), etc
 */
 
 //BEGIN VARIABLES
@@ -75,6 +73,46 @@ function mouseDragged()
 		Ladders[moveLadder].rungs[moveRung] = mouseY;
 		Ladders[moveLadder].rightRungs[moveRightRung] = mouseY;
 		Ladders[moveLadder].leftRungs[moveLeftRung] = mouseY;
+	}
+	//Check for other guns on the SAME ladder.
+	//Does not let rungs "collide" with other rungs
+	for(var i=0;i<Ladders[moveLadder].rungs.length;i++)
+	{
+		if(i != moveRung &&
+			Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder].rungs[i]+2*(clickRad+2)) &&
+			Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder].rungs[i]-2*(clickRad+2)))
+			{
+				if(Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder].rungs[i]-2*(clickRad);}
+				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder].rungs[i]+2*(clickRad);}
+			}
+	}
+	//Checks rungs on ladder to the left and does not let moveRung come within rungRad of it
+	for(var i=0;i<Ladders[moveLadder-1].rungs.length;i++)
+	{
+		if(//i != moveRung &&
+			Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder-1].rungs[i]+2*(rungRad+2)) &&
+			Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]-2*(rungRad+2)))
+			{
+				if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder-1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]-2*(rungRad);}
+				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]+2*(rungRad);}
+			}
+	}
+	//Checks rungs on ladder to the right and does not let moveRung come within rungRad of it
+	for(var i=0;i<Ladders[moveLadder+1].rungs.length;i++)
+	{
+		if(//i != moveRung &&
+			Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder+1].rungs[i]+2*(rungRad+2)) &&
+			Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]-2*(rungRad+2)))
+			{
+				if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder+1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]-2*(rungRad);}
+				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]+2*(rungRad);}
+			}
 	}
 }
 
@@ -357,18 +395,17 @@ function swapValues(ladder) {
 	solverSet[ladder + 1] = tempValue;
 }
 
-function swapValuesLeft(ladder) {
+function swapValuesRight(ladder) {
 	tempValue = solverSet[ladder];
 	solverSet[ladder] = -1*(solverSet[ladder + 1]);
 	solverSet[ladder + 1] = tempValue;
 }
 
-function swapValuesRight(ladder) {
+function swapValuesLeft(ladder) {
 	tempValue = solverSet[ladder];
 	solverSet[ladder] = solverSet[ladder + 1];
 	solverSet[ladder + 1] = -1*(tempValue);
 }
-
 
 function getMinTranspositions()
 {

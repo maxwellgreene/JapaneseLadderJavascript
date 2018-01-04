@@ -3,23 +3,20 @@ To Do:
 
 Restart game option?
 
-
 */
 
 //BEGIN VARIABLES
 var numRails = 5;
 var Ladders = [];
-//var rungs = [];
 var offset = 6000;
 var solverSet = [];
 var goalSet = [];
-var tempValue;
 var sameCounter = 0;
 var minTranspositions = 0;
-var tempBool = false;
-var clickRad = 10;
+var tempBool = false; var tempValue;
+var clickRad = 10; var rungRad = 2;
 var startX,startY;
-var mouseThresh = 0;
+var mouseThresh = 2;
 var moveLadder,moveRung;
 //END VARIABLES
 
@@ -68,8 +65,50 @@ function mousePressed() {
 
 function mouseDragged()
 {
+	//Simply set value or moving rung to mouseY
 	if (mouseY > ((1 / 5) * height) & mouseY < ((4 / 5) * height)) {
 		Ladders[moveLadder].rungs[moveRung] = mouseY;
+	}
+
+	//Check for other guns on the SAME ladder.
+	//Does not let rungs "collide" with other rungs
+	for(var i=0;i<Ladders[moveLadder].rungs.length;i++)
+	{
+		if(i != moveRung &&
+			Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder].rungs[i]+2*(clickRad+2)) &&
+			Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder].rungs[i]-2*(clickRad+2)))
+			{
+				if(Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder].rungs[i]-2*(clickRad);}
+				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder].rungs[i]+2*(clickRad);}
+			}
+	}
+	//Checks rungs on ladder to the left and does not let moveRung come within rungRad of it
+	for(var i=0;i<Ladders[moveLadder-1].rungs.length;i++)
+	{
+		if(//i != moveRung &&
+			Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder-1].rungs[i]+2*(rungRad+2)) &&
+			Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]-2*(rungRad+2)))
+			{
+				if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder-1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]-2*(rungRad);}
+				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]+2*(rungRad);}
+			}
+	}
+	//Checks rungs on ladder to the right and does not let moveRung come within rungRad of it
+	for(var i=0;i<Ladders[moveLadder+1].rungs.length;i++)
+	{
+		if(//i != moveRung &&
+			Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder+1].rungs[i]+2*(rungRad+2)) &&
+			Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]-2*(rungRad+2)))
+			{
+				if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder+1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]-2*(rungRad);}
+				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]+2*(rungRad);}
+			}
 	}
 }
 
@@ -138,7 +177,7 @@ function Ladder(_rungs, _ladderNum) {
 Ladder.prototype.display = function(_length) {
 	stroke(255);
 	for (var i = 0; i < _length; i++) {
-		strokeWeight(4);
+		strokeWeight(rungRad*2);
 		line(getLeft(this.ladderNum), this.rungs[i], getLeft(this.ladderNum) + (width / numRails), this.rungs[i]);
 		line(getRight(this.ladderNum) - (width / numRails), this.rungs[i], getRight(this.ladderNum), this.rungs[i]);
 		strokeWeight(1);
