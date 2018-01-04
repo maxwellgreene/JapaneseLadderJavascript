@@ -14,7 +14,7 @@ var tempValue;
 var sameCounter = 0;
 var minTranspositions = 0;
 var tempBool = false;
-var clickRad = 10;
+var clickRad = 10; var rungRad = 2;
 var startX,startY;
 var mouseThresh = 0;
 var moveLadder,moveRung,moveLeftRung,moveRightRung;
