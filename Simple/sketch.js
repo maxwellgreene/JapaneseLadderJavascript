@@ -1,8 +1,9 @@
 /*
 To Do:
 
-functions:
-addrungs(), etc
+Restart game option?
+
+
 */
 
 //BEGIN VARIABLES

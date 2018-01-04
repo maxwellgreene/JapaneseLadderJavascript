@@ -35,10 +35,13 @@ function setup() {
 		Ladders[i] = new Ladder(rungs, i, leftRungs, rightRungs);
 	}
 	for (var j = 0; j < numRails; j++) {
-		goalSet[j] = j+1;
+		if(random(2)>1)
+		{goalSet[j] = -1*(j+1);}else
+		{goalSet[j] = j+1;}
 	}
 	shuffle(goalSet,true);
 	minTranspositions = getMinTranspositions();
+	print(minTranspositions);
 }
 //END SETUP
 
@@ -313,9 +316,19 @@ function Solver() {
 			for (var element = 0; element < Ladders[ladder].rungs.length; element++) {
 				if(Ladders[ladder].rungs[element] == pixel)
 				{
-					tempValue = solverSet[ladder];
-					solverSet[ladder] = solverSet[ladder + 1];
-					solverSet[ladder + 1] = tempValue;
+					swapValues(ladder);
+				}
+			}
+			for (var element = 0; element < Ladders[ladder].leftRungs.length; element++) {
+				if(Ladders[ladder].leftRungs[element] == pixel)
+				{
+					swapValuesLeft(ladder);
+				}
+			}
+			for (var element = 0; element < Ladders[ladder].rightRungs.length; element++) {
+				if(Ladders[ladder].rightRungs[element] == pixel)
+				{
+					swapValuesRight(ladder);
 				}
 			}
 		}
@@ -344,6 +357,19 @@ function swapValues(ladder) {
 	solverSet[ladder + 1] = tempValue;
 }
 
+function swapValuesLeft(ladder) {
+	tempValue = solverSet[ladder];
+	solverSet[ladder] = -1*(solverSet[ladder + 1]);
+	solverSet[ladder + 1] = tempValue;
+}
+
+function swapValuesRight(ladder) {
+	tempValue = solverSet[ladder];
+	solverSet[ladder] = solverSet[ladder + 1];
+	solverSet[ladder + 1] = -1*(tempValue);
+}
+
+
 function getMinTranspositions()
 {
 	sameCounter = 0;
@@ -351,7 +377,7 @@ function getMinTranspositions()
 	{
 		for(var j=i+1;j<goalSet.length;j++)
 		{
-			if(goalSet[j]<goalSet[i])
+			if(abs(goalSet[j])<abs(goalSet[i]))
 			{
 				sameCounter+=1;
 			}
