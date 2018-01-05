@@ -357,20 +357,21 @@ function Solver() {
 					swapValues(ladder);
 				}
 			}
-			for (var element = 0; element < Ladders[ladder].leftRungs.length; element++) {
-				if(Ladders[ladder].leftRungs[element] == pixel)
+			for (var elementLeft = 0; elementLeft < Ladders[ladder].leftRungs.length; elementLeft++) {
+				if(Ladders[ladder].leftRungs[elementLeft] == pixel)
 				{
 					swapValuesLeft(ladder);
 				}
 			}
-			for (var element = 0; element < Ladders[ladder].rightRungs.length; element++) {
-				if(Ladders[ladder].rightRungs[element] == pixel)
+			for (var elementRight = 0; elementRight < Ladders[ladder].rightRungs.length; elementRight++) {
+				if(Ladders[ladder].rightRungs[elementRight] == pixel)
 				{
 					swapValuesRight(ladder);
 				}
 			}
 		}
 	}
+
 
 	if(goalVsSolver() && minTranspositions == getNumTranspositions())
 	{
@@ -429,6 +430,8 @@ function getNumTranspositions()
 	for(var i=0;i<goalSet.length-1;i++)
 	{
 		sameCounter += Ladders[i].rungs.length;
+		sameCounter += Ladders[i].leftRungs.length;
+		sameCounter += Ladders[i].rightRungs.length;
 	}
 	return(sameCounter);
 }
