@@ -2,7 +2,7 @@
 To Do:
 
 Restart game option?
-
+Add dragging to slide left/right
 */
 
 //BEGIN VARIABLES
@@ -85,30 +85,36 @@ function mouseDragged()
 			}
 	}
 	//Checks rungs on ladder to the left and does not let moveRung come within rungRad of it
-	for(var i=0;i<Ladders[moveLadder-1].rungs.length;i++)
+	if(moveLadder >0)
 	{
-		if(//i != moveRung &&
-			Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder-1].rungs[i]+2*(rungRad+2)) &&
-			Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]-2*(rungRad+2)))
-			{
-				if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder-1].rungs[i]))
-				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]-2*(rungRad);}
-				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]))
-				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]+2*(rungRad);}
+		for(var i=0;i<Ladders[moveLadder-1].rungs.length;i++)
+		{
+			if(//i != moveRung &&
+				Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder-1].rungs[i]+2*(rungRad+2)) &&
+				Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]-2*(rungRad+2)))
+				{
+					if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder-1].rungs[i]))
+					{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]-2*(rungRad);}
+					if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]))
+					{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]+2*(rungRad);}
+				}
 			}
 	}
 	//Checks rungs on ladder to the right and does not let moveRung come within rungRad of it
-	for(var i=0;i<Ladders[moveLadder+1].rungs.length;i++)
+	if(moveLadder < numRails+1)
 	{
-		if(//i != moveRung &&
-			Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder+1].rungs[i]+2*(rungRad+2)) &&
-			Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]-2*(rungRad+2)))
-			{
-				if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder+1].rungs[i]))
-				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]-2*(rungRad);}
-				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]))
-				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]+2*(rungRad);}
-			}
+		for(var i=0;i<Ladders[moveLadder+1].rungs.length;i++)
+		{
+			if(//i != moveRung &&
+				Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder+1].rungs[i]+2*(rungRad+2)) &&
+				Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]-2*(rungRad+2)))
+				{
+					if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder+1].rungs[i]))
+					{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]-2*(rungRad);}
+					if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]))
+					{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]+2*(rungRad);}
+				}
+		}
 	}
 }
 
@@ -285,6 +291,7 @@ function Solver() {
 }
 
 function swapValues(ladder) {
+	print(ladder);
 	tempValue = solverSet[ladder];
 	solverSet[ladder] = solverSet[ladder + 1];
 	solverSet[ladder + 1] = tempValue;

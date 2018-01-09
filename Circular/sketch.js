@@ -1,32 +1,31 @@
 /*
 To Do:
 
-functions:
-addrungs(), etc
+Restart game option?
+
 */
 
 //BEGIN VARIABLES
 var numRails = 5;
 var Ladders = [];
-//var rungs = [];
 var offset = 6000;
 var solverSet = [];
 var goalSet = [];
-var tempValue;
 var sameCounter = 0;
 var minTranspositions = 0;
-var tempBool = false;
-var clickRad = 10;
-var startX,startY;
-var mouseThresh = 0;
+var tempBool = false; var tempValue;
+var clickRad = 10; var rungRad = 2;
+var startX,startY,tempX;
+var mouseThresh = 2;
 var moveLadder,moveRung;
+var mouseDrag = true;
 //END VARIABLES
 
 //BEGIN SETUP
 function setup() {
 	createCanvas(600, 600);
 	frameRate(30);
-	for (var i = 0; i < numRails - 1; i++) {
+	for (var i = 0; i < numRails+1; i++) {
 		let rungs = [];
 		Ladders[i] = new Ladder(rungs, i);
 	}
@@ -46,11 +45,14 @@ function draw() {
 	drawRails();
 	drawRungs();
 	Solver();
-	drawSolver();
+	//drawSolver();
 
+  /*
 	for (var i = 0; i < Ladders.length; i++) {
 		Ladders[i].display(Ladders[i].rungs.length);
 	}
+	*/
+
 	if (keyIsPressed) {
 		keyPressed();
 	}
@@ -67,8 +69,59 @@ function mousePressed() {
 
 function mouseDragged()
 {
+	if(mouseDrag)
+	{
+		offset += (mouseX-startX);
+	}
+	startX = mouseX;
+
+	//Simply set value or moving rung to mouseY
 	if (mouseY > ((1 / 5) * height) & mouseY < ((4 / 5) * height)) {
 		Ladders[moveLadder].rungs[moveRung] = mouseY;
+		print(moveLadder+"  "+moveRung);
+	}
+
+
+	//Check for other rungs on the SAME ladder.
+	//Does not let rungs "collide" with other rungs
+	for(var i=0;i<Ladders[moveLadder].rungs.length+1;i++)
+	{
+		if(i != moveRung &&
+			Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder].rungs[i]+2*(clickRad+2)) &&
+			Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder].rungs[i]-2*(clickRad+2)))
+			{
+				if(Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder].rungs[i]-2*(clickRad);}
+				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder].rungs[i]+2*(clickRad);}
+			}
+	}
+	//Checks rungs on ladder to the left and does not let moveRung come within rungRad of it
+	if(moveLadder == 0){tempValue = numRails;}else{tempValue = moveLadder-1;}
+	for(var i=0;i<Ladders[tempValue].rungs.length;i++)
+	{
+		if(//i != moveRung &&
+			Ladders[moveLadder].rungs[moveRung] < (Ladders[(moveLadder-1)%numRails].rungs[i]+2*(rungRad+2)) &&
+			Ladders[moveLadder].rungs[moveRung] > (Ladders[(moveLadder-1)%numRails].rungs[i]-2*(rungRad+2)))
+			{
+				if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[(moveLadder-1)%numRails].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[(moveLadder-1)%numRails].rungs[i]-2*(rungRad);}
+				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[(moveLadder-1)%numRails].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[(moveLadder-1)%numRails].rungs[i]+2*(rungRad);}
+			}
+	}
+	//Checks rungs on ladder to the right and does not let moveRung come within rungRad of it
+	for(var i=0;i<Ladders[(moveLadder+1)%numRails].rungs.length;i++)
+	{
+		if(//i != moveRung &&
+			Ladders[moveLadder].rungs[moveRung] < (Ladders[(moveLadder+1)%numRails].rungs[i]+2*(rungRad+2)) &&
+			Ladders[moveLadder].rungs[moveRung] > (Ladders[(moveLadder+1)%numRails].rungs[i]-2*(rungRad+2)))
+			{
+				if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[(moveLadder+1)%numRails].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[(moveLadder+1)%numRails].rungs[i]-2*(rungRad);}
+				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[(moveLadder+1)%numRails].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[(moveLadder+1)%numRails].rungs[i]+2*(rungRad);}
+			}
 	}
 }
 
@@ -79,9 +132,6 @@ function mouseReleased()
 		if (mouseY > ((1 / 5) * height) && mouseY < ((4 / 5) * height)) {
 			interact(mouseX, mouseY);
 		}
-	}
-	for (var i = 0; i < Ladders.length; i++) {
-		Ladders[i].printit();
 	}
 	moveLadder = null; moveRung = null;
 }
@@ -137,7 +187,7 @@ function Ladder(_rungs, _ladderNum) {
 Ladder.prototype.display = function(_length) {
 	stroke(255);
 	for (var i = 0; i < _length; i++) {
-		strokeWeight(4);
+		strokeWeight(rungRad*2);
 		line(getLeft(this.ladderNum), this.rungs[i], getLeft(this.ladderNum) + (width / numRails), this.rungs[i]);
 		line(getRight(this.ladderNum) - (width / numRails), this.rungs[i], getRight(this.ladderNum), this.rungs[i]);
 		strokeWeight(1);
@@ -191,9 +241,8 @@ function drawRungs() {
 function drawSolver() {
 	textSize(20);
 	fill(255);
-
 	noStroke(0);
-	fill(255,0,0);
+
 	//solved
 	for (var i = 0; i < numRails; i++) {
 		text(solverSet[i], getLeft(i) - 5, (4 / 5) * height + 25);
@@ -219,15 +268,16 @@ function Solver() {
 			for (var element = 0; element < Ladders[ladder].rungs.length; element++) {
 				if(Ladders[ladder].rungs[element] == pixel)
 				{
-					tempValue = solverSet[ladder];
-					solverSet[ladder] = solverSet[ladder + 1];
-					solverSet[ladder + 1] = tempValue;
+					tempValue = solverSet[(ladder)%numRails];
+					solverSet[(ladder)%numRails] = solverSet[(ladder+1)%numRails];
+					solverSet[(ladder+1)%numRails] = tempValue;
 				}
 			}
 		}
 	}
+	drawSolver();
 
-	if(goalVsSolver() && minTranspositions == getNumTranspositions())
+	if(goalVsSolver())// && minTranspositions == getNumTranspositions())
 	{
 		textSize(25);
 		stroke(0);
@@ -245,9 +295,9 @@ function Solver() {
 }
 
 function swapValues(ladder) {
-	tempValue = solverSet[ladder];
-	solverSet[ladder] = solverSet[ladder + 1];
-	solverSet[ladder + 1] = tempValue;
+	tempValue = solverSet[(ladder)%numRails];
+	solverSet[(ladder)%numRails] = solverSet[(ladder+1)%numRails];
+	solverSet[(ladder+1)%numRails] = tempValue;
 }
 
 function getMinTranspositions()
