@@ -60,7 +60,34 @@ function mousePressed() {
 	startX = mouseX;
 	startY = mouseY;
 
+	fill(255);
+	if(mouseX>400 && mouseX < 516 && mouseY > 15 && mouseY < 47)
+	{
+		if(mouseX < 432)
+			{restartSketch(2);}
+		if(mouseX > 442 && mouseX < 474)
+			{restartSketch(1);}
+		if(mouseX > 484)
+			{restartSketch(0);}
+	}
 	setMovingRung(startX,startY);
+}
+
+function restartSketch(type)
+{
+	if(type == 2)
+	{numRails++;}
+	if(type == 1)
+	{numRails--;}
+	for (var i = 0; i < numRails+1; i++) {
+		let rungs = [];
+		Ladders[i] = new Ladder(rungs, i);
+	}
+	for (var j = 0; j < numRails; j++) {
+		goalSet[j] = j+1;
+	}
+	shuffle(goalSet,true);
+	minTranspositions = getMinTranspositions();
 }
 
 function mouseDragged()
@@ -189,8 +216,9 @@ Ladder.prototype.display = function(_length) {
 		strokeWeight(1);
 		fill(255,0,0,4);
 		noStroke();
-		rect(getLeft(this.ladderNum), this.rungs[i]-clickRad, getRight(this.ladderNum)-getLeft(this.ladderNum), 2*clickRad);
-		rect(getRight(this.ladderNum) - (width / numRails), this.rungs[i]-clickRad, getRight(this.ladderNum)-getLeft(this.ladderNum), 2*clickRad);
+		rect(getLeft(this.ladderNum), this.rungs[i]-clickRad, width/numRails , 2*clickRad);
+		//rect(getRight(this.ladderNum) - (width / numRails), this.rungs[i]-clickRad, getRight(this.ladderNum)-getLeft(this.ladderNum), 2*clickRad);
+		rect(getRight(this.ladderNum), this.rungs[i]-clickRad, -1*(width/numRails), 2*clickRad);
 		stroke(255);
 	}
 }
@@ -218,7 +246,22 @@ function drawGUI() {
 	textSize(32);
 	text("Japanese Ladder Game!", 10, 42);
 
+	fill(255,0,0,15);
+	textSize(50);
+	rect(400,15,32,32);
+	rect(442,15,32,32);
+	rect(484,15,32,32);
+
+	stroke(255);
+	strokeWeight(4);
+	line(405,31,427,31); line(416,20,416,42);
+	line(447,31,469,31);
+
+	ellipse(500,31,17);
+
 	noFill();
+	strokeWeight(1);
+
 	if (mouseIsPressed) {
 		stroke(0, 255, 0, 100);
 	} else {
