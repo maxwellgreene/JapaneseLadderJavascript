@@ -1,8 +1,8 @@
 /*
 To Do:
 
-Restart game option?
-Add dragging to slide left/right
+Add tracing pathways
+add modes?
 */
 
 //BEGIN VARIABLES
@@ -61,6 +61,7 @@ function mousePressed() {
 	startY = mouseY;
 
 	fill(255);
+
 	if(mouseX>400 && mouseX < 516 && mouseY > 15 && mouseY < 47)
 	{
 		if(mouseX < 432)
@@ -230,6 +231,15 @@ Ladder.prototype.printit = function() {
 
 //BEGIN DRAWING FUNCTIONS
 function drawRails() {
+
+	/*
+	//draw shadows for rails
+	for (var i = 0; i < numRails; i++) {
+		stroke(50);	strokeWeight(5);
+		line(getLeft(i), (4 / 5) * height, getLeft(i) + (3*height/5), 2*height/5);
+	}
+	*/
+
 	for (var i = 0; i < numRails; i++) {
 		stroke(255);
 		line(getLeft(i), (1 / 5) * height, getLeft(i), (4 / 5) * height);

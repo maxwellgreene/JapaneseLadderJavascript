@@ -90,7 +90,7 @@ function restartSketch(type)
 
 function mouseDragged()
 {
-	if(mouseDrag)
+	if(mouseDrag && moveRung == null)
 	{
 		offset += (mouseX-startX);
 	}
