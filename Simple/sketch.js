@@ -62,28 +62,36 @@ function mousePressed() {
 
 	fill(255);
 
-	if(mouseX>400 && mouseX < 516 && mouseY > 15 && mouseY < 47)
+	if(mouseX>400 && mouseX < 558 && mouseY > 15 && mouseY < 47)
 	{
 		if(mouseX < 432)
 			{restartSketch(0);}
 		if(mouseX > 442 && mouseX < 474)
 			{restartSketch(1);}
-		if(mouseX > 484)
+		if(mouseX > 484 && mouseX < 496)
 			{restartSketch(2);}
+		if(mouseX > 526)
+		{
+			for(var i=0;i<numRails+1;i++)
+			{
+				Ladders[i].rungs= [];
+			}
+		}
 	}
 	setMovingRung(startX,startY);
 }
 
 function restartSketch(type)
 {
-	if(type == 2)
+	if(type == 2 && numRails < 13)
 	{numRails++;}
-	if(type == 0)
+	if(type == 0 && numRails > 2)
 	{numRails--;}
 	for (var i = 0; i < numRails+1; i++) {
 		let rungs = [];
 		Ladders[i] = new Ladder(rungs, i);
 	}
+	goalSet = [];
 	for (var j = 0; j < numRails; j++) {
 		goalSet[j] = j+1;
 	}
@@ -263,12 +271,14 @@ function drawGUI() {
 	rect(400,15,32,32);
 	rect(442,15,32,32);
 	rect(484,15,32,32);
+	rect(526,15,32,32);
 
 	stroke(255);
 	strokeWeight(4);
 	line(405,31,427,31);
 	ellipse(458,31,17);
 	line(489,31,511,31);	line(500,20,500,42);
+	line(533,22,551,40);	line(533,40,551,22);
 
 	noFill();
 	strokeWeight(1);
