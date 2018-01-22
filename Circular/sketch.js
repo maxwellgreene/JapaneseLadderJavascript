@@ -62,11 +62,11 @@ function mousePressed() {
 	if(mouseX>400 && mouseX < 516 && mouseY > 15 && mouseY < 47)
 	{
 		if(mouseX < 432)
-			{restartSketch(2);}
+			{restartSketch(0);}
 		if(mouseX > 442 && mouseX < 474)
 			{restartSketch(1);}
 		if(mouseX > 484)
-			{restartSketch(0);}
+			{restartSketch(2);}
 	}
 	setMovingRung(startX,startY);
 }
@@ -75,7 +75,7 @@ function restartSketch(type)
 {
 	if(type == 2)
 	{numRails++;}
-	if(type == 1)
+	if(type == 0)
 	{numRails--;}
 	for (var i = 0; i < numRails+1; i++) {
 		let rungs = [];
@@ -247,16 +247,17 @@ function drawGUI() {
 
 	fill(255,0,0,15);
 	textSize(50);
+	noStroke();
+
 	rect(400,15,32,32);
 	rect(442,15,32,32);
 	rect(484,15,32,32);
 
 	stroke(255);
 	strokeWeight(4);
-	line(405,31,427,31); line(416,20,416,42);
-	line(447,31,469,31);
-
-	ellipse(500,31,17);
+	line(405,31,427,31);
+	ellipse(458,31,17);
+	line(489,31,511,31);	line(500,20,500,42);
 
 	noFill();
 	strokeWeight(1);
