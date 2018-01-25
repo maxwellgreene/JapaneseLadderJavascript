@@ -130,6 +130,8 @@ function mouseDragged()
 			}
 	}
 	//Checks rungs on ladder to the left and does not let moveRung come within rungRad of it
+	if(moveLadder != 0)
+	{
 	for(var i=0;i<Ladders[moveLadder-1].leftRungs.length;i++)
 	{
 		if(//i != moveRung &&
@@ -142,7 +144,10 @@ function mouseDragged()
 				{Ladders[moveLadder].leftRungs[moveLeftRung] = Ladders[moveLadder-1].leftRungs[i]+2*(rungRad);}
 			}
 	}
+	}
 	//Checks rungs on ladder to the right and does not let moveRung come within rungRad of it
+	if(moveLadder != numRails)
+	{
 	for(var i=0;i<Ladders[moveLadder+1].leftRungs.length;i++)
 	{
 		if(//i != moveRung &&
@@ -155,7 +160,7 @@ function mouseDragged()
 				{Ladders[moveLadder].leftRungs[moveLeftRung] = Ladders[moveLadder+1].leftRungs[i]+2*(rungRad);}
 			}
 	}
-
+	}
 	for(var i=0;i<Ladders[moveLadder].rightRungs.length;i++)
 	{
 		if(i != moveRightRung &&
@@ -169,6 +174,8 @@ function mouseDragged()
 			}
 	}
 	//Checks rungs on ladder to the left and does not let moveRung come within rungRad of it
+	if(moveLadder != 0)
+	{
 	for(var i=0;i<Ladders[moveLadder-1].rightRungs.length;i++)
 	{
 		if(//i != moveRung &&
@@ -181,7 +188,10 @@ function mouseDragged()
 				{Ladders[moveLadder].rightRungs[moveRightRung] = Ladders[moveLadder-1].rightRungs[i]+2*(rungRad);}
 			}
 	}
+	}
 	//Checks rungs on ladder to the right and does not let moveRung come within rungRad of it
+	if(moveLadder != numRails)
+	{
 	for(var i=0;i<Ladders[moveLadder+1].rightRungs.length;i++)
 	{
 		if(//i != moveRung &&
@@ -193,6 +203,7 @@ function mouseDragged()
 				if(Ladders[moveLadder].rightRungs[moveRightRung] > (Ladders[moveLadder+1].rightRungs[i]))
 				{Ladders[moveLadder].rightRungs[moveRightRung] = Ladders[moveLadder+1].rightRungs[i]+2*(rungRad);}
 			}
+	}
 	}
 }
 
