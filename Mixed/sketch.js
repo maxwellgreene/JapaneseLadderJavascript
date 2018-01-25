@@ -295,9 +295,9 @@ Ladder.prototype.displayLeftRungs = function(_length) {
 		strokeWeight(1);
 		fill(255,0,0,4);
 		noStroke();
-		rect(getLeft(this.ladderNum), this.rungs[i]-clickRad, width/numRails , 2*clickRad);
+		rect(getLeft(this.ladderNum), this.leftRungs[i]-clickRad, width/numRails , 2*clickRad);
 		//rect(getRight(this.ladderNum) - (width / numRails), this.rungs[i]-clickRad, getRight(this.ladderNum)-getLeft(this.ladderNum), 2*clickRad);
-		rect(getRight(this.ladderNum), this.rungs[i]-clickRad, -1*(width/numRails), 2*clickRad);
+		rect(getRight(this.ladderNum), this.leftRungs[i]-clickRad, -1*(width/numRails), 2*clickRad);
 		stroke(255);
 	}
 }
@@ -331,10 +331,13 @@ function drawRails() {
 	for (var i = 0; i < numRails; i++) {
 		stroke(255);
 		line(getLeft(i), (1 / 5) * height, getLeft(i), (4 / 5) * height);
-		fill(255,0,0,5);
+		fill(255,0,0,8);
 		noStroke();
-		rect(getLeft(i),(height/5),borderSize,(3*height/5));
-		rect(getRight(i)-borderSize,(height/5),borderSize,(3*height/5));
+		if(i < numRails-1)
+		{
+			rect(getLeft(i),(height/5),borderSize,(3*height/5));
+			rect(getRight(i)-borderSize,(height/5),borderSize,(3*height/5));
+		}
 		textSize(20);
 		noStroke();
 		fill(255);
@@ -348,7 +351,7 @@ function drawGUI() {
 	textSize(26);
 	text("Japanese Ladder Game!", 10, 42);
 	textSize(20);
-	text("Left/Right Edition", 10, 66);
+	text("Mixed Edition", 10, 66);
 
 	fill(255,0,0,15);
 	textSize(50);
