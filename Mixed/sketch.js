@@ -1,39 +1,45 @@
 /*
 To Do:
 
-address left/right solver
-add collisions to left/right
-add mixed and left/right modes
 */
 
 //BEGIN VARIABLES
 var numRails = 5;
 var Ladders = [];
+//var rungs = [];
 var offset = 6000;
 var solverSet = [];
 var goalSet = [];
+var tempValue;
 var sameCounter = 0;
 var minTranspositions = 0;
-var tempBool = false; var tempValue;
+var tempBool = false;
 var clickRad = 10; var rungRad = 2;
 var startX,startY;
-var mouseThresh = 2;
-var moveLadder,moveRung;
+var mouseThresh = 0;
+var moveLadder,moveRung,moveLeftRung,moveRightRung;
+var bordersize;
 //END VARIABLES
 
 //BEGIN SETUP
 function setup() {
 	createCanvas(600, 600);
+	borderSize = width/((numRails+1)*3);
 	frameRate(30);
 	for (var i = 0; i < numRails - 1; i++) {
 		let rungs = [];
-		Ladders[i] = new Ladder(rungs, i);
+		let leftRungs = [];
+		let rightRungs = [];
+		Ladders[i] = new Ladder(rungs, i, leftRungs, rightRungs);
 	}
 	for (var j = 0; j < numRails; j++) {
-		goalSet[j] = j+1;
+		if(random(2)>1)
+		{goalSet[j] = -1*(j+1);}else
+		{goalSet[j] = j+1;}
 	}
 	shuffle(goalSet,true);
 	minTranspositions = getMinTranspositions();
+	print(minTranspositions);
 }
 //END SETUP
 
@@ -47,9 +53,6 @@ function draw() {
 	Solver();
 	drawSolver();
 
-	for (var i = 0; i < Ladders.length; i++) {
-		Ladders[i].display(Ladders[i].rungs.length);
-	}
 	if (keyIsPressed) {
 		keyPressed();
 	}
@@ -62,7 +65,6 @@ function mousePressed() {
 	startY = mouseY;
 
 	fill(255);
-
 	if(mouseX>400 && mouseX < 558 && mouseY > 15 && mouseY < 47)
 	{
 		if(mouseX < 432)
@@ -75,7 +77,9 @@ function mousePressed() {
 		{
 			for(var i=0;i<numRails+1;i++)
 			{
-				Ladders[i].rungs= [];
+				Ladders[i].rungs = [];
+				Ladders[i].leftRungs = [];
+				Ladders[i].rightRungs = [];
 			}
 		}
 	}
@@ -88,13 +92,18 @@ function restartSketch(type)
 	{numRails++;}
 	if(type == 0 && numRails > 2)
 	{numRails--;}
-	for (var i = 0; i < numRails+1; i++) {
+	borderSize = width/((numRails+1)*3)
+	for (var i = 0; i < numRails - 1; i++) {
 		let rungs = [];
-		Ladders[i] = new Ladder(rungs, i);
+		let leftRungs = [];
+		let rightRungs = [];
+		Ladders[i] = new Ladder(rungs, i, leftRungs, rightRungs);
 	}
 	goalSet = [];
 	for (var j = 0; j < numRails; j++) {
-		goalSet[j] = j+1;
+		if(random(2)>1)
+		{goalSet[j] = -1*(j+1);}else
+		{goalSet[j] = j+1;}
 	}
 	shuffle(goalSet,true);
 	minTranspositions = getMinTranspositions();
@@ -102,11 +111,11 @@ function restartSketch(type)
 
 function mouseDragged()
 {
-	//Simply set value or moving rung to mouseY
 	if (mouseY > ((1 / 5) * height) & mouseY < ((4 / 5) * height)) {
 		Ladders[moveLadder].rungs[moveRung] = mouseY;
+		Ladders[moveLadder].rightRungs[moveRightRung] = mouseY;
+		Ladders[moveLadder].leftRungs[moveLeftRung] = mouseY;
 	}
-
 	//Check for other guns on the SAME ladder.
 	//Does not let rungs "collide" with other rungs
 	for(var i=0;i<Ladders[moveLadder].rungs.length;i++)
@@ -122,36 +131,30 @@ function mouseDragged()
 			}
 	}
 	//Checks rungs on ladder to the left and does not let moveRung come within rungRad of it
-	if(moveLadder >0)
+	for(var i=0;i<Ladders[moveLadder-1].rungs.length;i++)
 	{
-		for(var i=0;i<Ladders[moveLadder-1].rungs.length;i++)
-		{
-			if(//i != moveRung &&
-				Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder-1].rungs[i]+2*(rungRad+2)) &&
-				Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]-2*(rungRad+2)))
-				{
-					if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder-1].rungs[i]))
-					{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]-2*(rungRad);}
-					if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]))
-					{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]+2*(rungRad);}
-				}
+		if(//i != moveRung &&
+			Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder-1].rungs[i]+2*(rungRad+2)) &&
+			Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]-2*(rungRad+2)))
+			{
+				if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder-1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]-2*(rungRad);}
+				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder-1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder-1].rungs[i]+2*(rungRad);}
 			}
 	}
 	//Checks rungs on ladder to the right and does not let moveRung come within rungRad of it
-	if(moveLadder < numRails+1)
+	for(var i=0;i<Ladders[moveLadder+1].rungs.length;i++)
 	{
-		for(var i=0;i<Ladders[moveLadder+1].rungs.length;i++)
-		{
-			if(//i != moveRung &&
-				Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder+1].rungs[i]+2*(rungRad+2)) &&
-				Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]-2*(rungRad+2)))
-				{
-					if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder+1].rungs[i]))
-					{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]-2*(rungRad);}
-					if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]))
-					{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]+2*(rungRad);}
-				}
-		}
+		if(//i != moveRung &&
+			Ladders[moveLadder].rungs[moveRung] < (Ladders[moveLadder+1].rungs[i]+2*(rungRad+2)) &&
+			Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]-2*(rungRad+2)))
+			{
+				if(Ladders[moveLadder].rungs[moveRung] <= (Ladders[moveLadder+1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]-2*(rungRad);}
+				if(Ladders[moveLadder].rungs[moveRung] > (Ladders[moveLadder+1].rungs[i]))
+				{Ladders[moveLadder].rungs[moveRung] = Ladders[moveLadder+1].rungs[i]+2*(rungRad);}
+			}
 	}
 }
 
@@ -166,7 +169,7 @@ function mouseReleased()
 	for (var i = 0; i < Ladders.length; i++) {
 		Ladders[i].printit();
 	}
-	moveLadder = null; moveRung = null;
+	moveLadder = null; moveRung = null; moveLeftRung = null; moveRightRung = null;
 }
 
 function keyPressed() {
@@ -193,11 +196,41 @@ function interact(X, Y) {
 					tempBool = true;
 				}
 			}
+			for(var j=0;j<Ladders[i].leftRungs.length;j++)
+			{
+				if(Y<(Ladders[i].leftRungs[j]+clickRad) && Y>(Ladders[i].leftRungs[j]-clickRad))
+				{
+					Ladders[i].leftRungs.splice(j,1);
+					tempBool = true;
+				}
+			}
+			for(var j=0;j<Ladders[i].rightRungs.length;j++)
+			{
+				if(Y<(Ladders[i].rightRungs[j]+clickRad) && Y>(Ladders[i].rightRungs[j]-clickRad))
+				{
+					Ladders[i].rightRungs.splice(j,1);
+					tempBool = true;
+				}
+			}
 		}
 	}
 	if(!tempBool)
 	{
-		addRung(X,Y);
+		for(var i = 0;i<numRails;i++)
+		{
+			if(X<getRight(i)-borderSize && X>getLeft(i)+borderSize)
+			{
+				addRung(X,Y);
+			}
+			if(X<getLeft(i)+borderSize && X>getLeft(i))
+			{
+				addLeftRung(X,Y);
+			}
+			if(X>getRight(i)-borderSize && X<getRight(i))
+			{
+				addRightRung(X,Y);
+			}
+		}
 	}
 }
 //END GUI
@@ -210,25 +243,80 @@ function addRung(X,Y)
 		}
 	}
 }
-
-//BEGIN LADDER
-function Ladder(_rungs, _ladderNum) {
-	this.rungs = _rungs;
-	this.ladderNum = _ladderNum;
+function addLeftRung(X,Y)
+{
+	for (var i = 0; i < numRails; i++) {
+		if (X > getLeft(i) & X < getRight(i)) {
+			append(Ladders[i].leftRungs, Y);
+		}
+	}
+}
+function addRightRung(X,Y)
+{
+	for (var i = 0; i < numRails; i++) {
+		if (X > getLeft(i) & X < getRight(i)) {
+			append(Ladders[i].rightRungs, Y);
+		}
+	}
 }
 
-Ladder.prototype.display = function(_length) {
+//BEGIN LADDER
+function Ladder(_rungs, _ladderNum, _leftRungs, _rightRungs) {
+	this.rungs = _rungs;
+	this.ladderNum = _ladderNum;
+	this.leftRungs = _leftRungs;
+	this.rightRungs = _rightRungs;
+}
+
+Ladder.prototype.displayRungs = function(_length) {
 	stroke(255);
 	for (var i = 0; i < _length; i++) {
-		strokeWeight(rungRad*2);
+		strokeWeight(4);
 		line(getLeft(this.ladderNum), this.rungs[i], getLeft(this.ladderNum) + (width / numRails), this.rungs[i]);
 		line(getRight(this.ladderNum) - (width / numRails), this.rungs[i], getRight(this.ladderNum), this.rungs[i]);
+		strokeWeight(1);
+		fill(255,0,0,4);
+		noStroke();
+		rect(getLeft(this.ladderNum), this.rungs[i]-clickRad, getRight(this.ladderNum)-getLeft(this.ladderNum), 2*clickRad);
+		rect(getRight(this.ladderNum) - (width / numRails), this.rungs[i]-clickRad, getRight(this.ladderNum)-getLeft(this.ladderNum), 2*clickRad);
+		stroke(255);
+	}
+}
+
+Ladder.prototype.displayLeftRungs = function(_length) {
+	stroke(255);
+	for (var i = 0; i < _length; i++) {
+		strokeWeight(4);
+		line(getLeft(this.ladderNum), this.leftRungs[i], getLeft(this.ladderNum) + (width / numRails), this.leftRungs[i]);
+		line(getRight(this.ladderNum) - (width / numRails), this.leftRungs[i], getRight(this.ladderNum), this.leftRungs[i]);
+		strokeWeight(1);
+		fill(255);
+		triangle(getCenter(this.ladderNum)+10,this.leftRungs[i]+10,getCenter(this.ladderNum)+10,this.leftRungs[i]-10,getCenter(this.ladderNum)-10,this.leftRungs[i]);
 		strokeWeight(1);
 		fill(255,0,0,4);
 		noStroke();
 		rect(getLeft(this.ladderNum), this.rungs[i]-clickRad, width/numRails , 2*clickRad);
 		//rect(getRight(this.ladderNum) - (width / numRails), this.rungs[i]-clickRad, getRight(this.ladderNum)-getLeft(this.ladderNum), 2*clickRad);
 		rect(getRight(this.ladderNum), this.rungs[i]-clickRad, -1*(width/numRails), 2*clickRad);
+		stroke(255);
+	}
+}
+
+Ladder.prototype.displayRightRungs = function(_length) {
+	stroke(255);
+	fill(255);
+	for (var i = 0; i < _length; i++) {
+		strokeWeight(4);
+		line(getLeft(this.ladderNum), this.rightRungs[i], getLeft(this.ladderNum) + (width / numRails), this.rightRungs[i]);
+		line(getRight(this.ladderNum) - (width / numRails), this.rightRungs[i], getRight(this.ladderNum), this.rightRungs[i]);
+		strokeWeight(1);
+		fill(255);
+		triangle(getCenter(this.ladderNum)-10,this.rightRungs[i]-10,getCenter(this.ladderNum)-10,this.rightRungs[i]+10,getCenter(this.ladderNum)+10,this.rightRungs[i]);
+		strokeWeight(1);
+		fill(255,0,0,4);
+		noStroke();
+		rect(getLeft(this.ladderNum), this.rightRungs[i]-clickRad, getRight(this.ladderNum)-getLeft(this.ladderNum), 2*clickRad);
+		rect(getRight(this.ladderNum) - (width / numRails), this.rightRungs[i]-clickRad, getRight(this.ladderNum)-getLeft(this.ladderNum), 2*clickRad);
 		stroke(255);
 	}
 }
@@ -240,18 +328,13 @@ Ladder.prototype.printit = function() {
 
 //BEGIN DRAWING FUNCTIONS
 function drawRails() {
-
-	/*
-	//draw shadows for rails
-	for (var i = 0; i < numRails; i++) {
-		stroke(50);	strokeWeight(5);
-		line(getLeft(i), (4 / 5) * height, getLeft(i) + (3*height/5), 2*height/5);
-	}
-	*/
-
 	for (var i = 0; i < numRails; i++) {
 		stroke(255);
 		line(getLeft(i), (1 / 5) * height, getLeft(i), (4 / 5) * height);
+		fill(255,0,0,5);
+		noStroke();
+		rect(getLeft(i),(height/5),borderSize,(3*height/5));
+		rect(getRight(i)-borderSize,(height/5),borderSize,(3*height/5));
 		textSize(20);
 		noStroke();
 		fill(255);
@@ -260,10 +343,12 @@ function drawRails() {
 }
 
 function drawGUI() {
-	noStroke();
+	noStroke(255);
 	fill(255);
-	textSize(32);
+	textSize(26);
 	text("Japanese Ladder Game!", 10, 42);
+	textSize(20);
+	text("Left/Right Edition", 10, 66);
 
 	fill(255,0,0,15);
 	textSize(50);
@@ -283,7 +368,6 @@ function drawGUI() {
 
 	noFill();
 	strokeWeight(1);
-
 	if (mouseIsPressed) {
 		stroke(0, 255, 0, 100);
 	} else {
@@ -295,7 +379,9 @@ function drawGUI() {
 function drawRungs() {
 	stroke(255);
 	for (var i = 0; i < Ladders.length; i++) {
-		Ladders[i].display(Ladders[i].rungs.length);
+		Ladders[i].displayRungs(Ladders[i].rungs.length);
+		Ladders[i].displayLeftRungs(Ladders[i].leftRungs.length);
+		Ladders[i].displayRightRungs(Ladders[i].rightRungs.length);
 	}
 }
 
@@ -330,13 +416,24 @@ function Solver() {
 			for (var element = 0; element < Ladders[ladder].rungs.length; element++) {
 				if(Ladders[ladder].rungs[element] == pixel)
 				{
-					tempValue = solverSet[ladder];
-					solverSet[ladder] = solverSet[ladder + 1];
-					solverSet[ladder + 1] = tempValue;
+					swapValues(ladder);
+				}
+			}
+			for (var elementLeft = 0; elementLeft < Ladders[ladder].leftRungs.length; elementLeft++) {
+				if(Ladders[ladder].leftRungs[elementLeft] == pixel)
+				{
+					swapValuesLeft(ladder);
+				}
+			}
+			for (var elementRight = 0; elementRight < Ladders[ladder].rightRungs.length; elementRight++) {
+				if(Ladders[ladder].rightRungs[elementRight] == pixel)
+				{
+					swapValuesRight(ladder);
 				}
 			}
 		}
 	}
+
 
 	if(goalVsSolver() && minTranspositions == getNumTranspositions())
 	{
@@ -356,10 +453,21 @@ function Solver() {
 }
 
 function swapValues(ladder) {
-	print(ladder);
 	tempValue = solverSet[ladder];
 	solverSet[ladder] = solverSet[ladder + 1];
 	solverSet[ladder + 1] = tempValue;
+}
+
+function swapValuesRight(ladder) {
+	tempValue = solverSet[ladder];
+	solverSet[ladder] = -1*(solverSet[ladder + 1]);
+	solverSet[ladder + 1] = tempValue;
+}
+
+function swapValuesLeft(ladder) {
+	tempValue = solverSet[ladder];
+	solverSet[ladder] = solverSet[ladder + 1];
+	solverSet[ladder + 1] = -1*(tempValue);
 }
 
 function getMinTranspositions()
@@ -369,7 +477,7 @@ function getMinTranspositions()
 	{
 		for(var j=i+1;j<goalSet.length;j++)
 		{
-			if(goalSet[j]<goalSet[i])
+			if(abs(goalSet[j])<abs(goalSet[i]))
 			{
 				sameCounter+=1;
 			}
@@ -384,6 +492,8 @@ function getNumTranspositions()
 	for(var i=0;i<goalSet.length-1;i++)
 	{
 		sameCounter += Ladders[i].rungs.length;
+		sameCounter += Ladders[i].leftRungs.length;
+		sameCounter += Ladders[i].rightRungs.length;
 	}
 	return(sameCounter);
 }
@@ -419,6 +529,20 @@ function setMovingRung(startX,startY)
 				if(startY<(Ladders[i].rungs[j]+clickRad) && startY>(Ladders[i].rungs[j]-clickRad))
 				{
 					moveLadder = i; moveRung = j;
+				}
+			}
+			for(var j=0;j<Ladders[i].leftRungs.length;j++)
+			{
+				if(startY<(Ladders[i].leftRungs[j]+clickRad) && startY>(Ladders[i].leftRungs[j]-clickRad))
+				{
+					moveLadder = i; moveLeftRung = j;
+				}
+			}
+			for(var j=0;j<Ladders[i].rightRungs.length;j++)
+			{
+				if(startY<(Ladders[i].rightRungs[j]+clickRad) && startY>(Ladders[i].rightRungs[j]-clickRad))
+				{
+					moveLadder = i; moveRightRung = j;
 				}
 			}
 		}
