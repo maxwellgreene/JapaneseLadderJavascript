@@ -434,6 +434,11 @@ function drawSolver() {
 	for (var j = 0; j < numRails; j++) {
 		text(goalSet[j], getLeft(j) - 5, (4 / 5) * height + 50);
 	}
+
+	noStroke();
+	textSize(12.5);
+	fill(255);
+	text("Optimal Solution: "+minTranspositions,25,height-15);
 }
 //END DRAWING FUNCTIONS
 
